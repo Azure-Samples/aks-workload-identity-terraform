@@ -14,10 +14,10 @@ resource "azurecaf_name" "acr" {
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                = azurecaf_name.acr.result
-  resource_group_name = var.resource_group
-  location            = var.location
-  admin_enabled       = false
-  sku                 = "Standard"
-  public_network_access_enabled = true   
+  name                          = azurecaf_name.acr.result
+  resource_group_name           = var.resource_group
+  location                      = var.location
+  admin_enabled                 = false
+  sku                           = "Standard"
+  public_network_access_enabled = true
 }

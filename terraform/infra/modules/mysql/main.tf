@@ -5,10 +5,10 @@ terraform {
       version = "1.2.16"
     }
     azapi = {
-      source  = "azure/azapi"
+      source = "azure/azapi"
     }
     azuread = {
-      source  = "hashicorp/azuread"
+      source = "hashicorp/azuread"
     }
   }
 }
@@ -82,7 +82,7 @@ locals {
   myip = chomp(data.http.myip.response_body)
 }
 
-# This rule is to enable current user
+# This rule is to enable current machine
 resource "azurerm_mysql_flexible_server_firewall_rule" "rule_allow_iac_machine" {
   name                = azurecaf_name.mysql_firewall_rule_allow_iac_machine.result
   resource_group_name = var.resource_group
@@ -91,19 +91,19 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "rule_allow_iac_machine" 
   end_ip_address      = local.myip
 }
 
-resource "azurecaf_name" "mysql_aadmin" {
+resource "azurecaf_name" "mysql_umi" {
   name          = var.application_name
   resource_type = "azurerm_user_assigned_identity"
   suffixes      = [var.environment, "mysql"]
 }
 
 resource "azurerm_user_assigned_identity" "mysql_umi" {
-  name                = azurecaf_name.mysql_aadmin.result
+  name                = azurecaf_name.mysql_umi.result
   resource_group_name = var.resource_group
   location            = var.location
 }
 
-# MySQL AAD Admin
+
 
 data "azurerm_resource_group" "parent_rg" {
   name = var.resource_group
@@ -122,7 +122,7 @@ resource "azapi_update_resource" "mysql_tf_identity" {
       type : "UserAssigned"
     },
   })
-  
+
   timeouts {
     create = "5m"
     update = "5m"
@@ -131,6 +131,7 @@ resource "azapi_update_resource" "mysql_tf_identity" {
   }
 }
 
+# MySQL AAD Admin
 data "azuread_user" "aad_admin" {
   user_principal_name = var.mysql_aad_admin
 }

@@ -5,7 +5,7 @@
 # and once registered
 # az provider register --namespace Microsoft.ContainerService
 
-cd aks/terraform
+cd terraform/infra
 # Get current user
 CURRENT_USER_OID=$(az ad signed-in-user show --query id -o tsv)
 CURRENT_USER_SPN=$(az ad signed-in-user show --query userPrincipalName -o tsv)

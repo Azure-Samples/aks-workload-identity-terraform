@@ -45,6 +45,29 @@ resource "azurerm_user_assigned_identity" "app_umi" {
   # }
 }
 
+# resource "azapi_resource" "federated_credential" {
+#   type      = "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2022-01-31-preview"
+#   name      = "fc-${var.appname}"
+#   parent_id = azurerm_user_assigned_identity.app_umi.id
+#   body = jsonencode({
+#     properties = {
+#       audiences = ["api://AzureADTokenExchange"]
+#       issuer    = var.aks_oidc_issuer_url
+#       subject   = "system:serviceaccount:${var.namespace}:${var.appname}"
+#     }
+#   })
+# }
+
+resource "azurerm_federated_identity_credential" "federated_credential" {
+  name                = "fc-${var.appname}"
+  resource_group_name = var.resource_group
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = var.aks_oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.app_umi.id
+  subject             = "system:serviceaccount:${var.namespace}:${var.appname}"
+}
+
+
 resource "kubernetes_service_account_v1" "service_account" {
   metadata {
     name      = var.appname
@@ -58,18 +81,7 @@ resource "kubernetes_service_account_v1" "service_account" {
   }
 }
 
-resource "azapi_resource" "federated_credential" {
-  type      = "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2022-01-31-preview"
-  name      = "fc-${var.appname}"
-  parent_id = azurerm_user_assigned_identity.app_umi.id
-  body = jsonencode({
-    properties = {
-      audiences = ["api://AzureADTokenExchange"]
-      issuer    = var.aks_oidc_issuer_url
-      subject   = "system:serviceaccount:${var.namespace}:${var.appname}"
-    }
-  })
-}
+
 
 # resource "azuread_application_federated_identity_credential" "federated_credential" {
 #   application_object_id = azurerm_user_assigned_identity.app_umi.id
