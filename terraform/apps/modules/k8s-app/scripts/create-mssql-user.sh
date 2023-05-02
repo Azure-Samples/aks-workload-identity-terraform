@@ -1,0 +1,15 @@
+DATABASE_FQDN=$1
+MANAGED_IDENTITY_NAME=$2
+APPLICATION_IDENTITY_APPID=$3
+DATABASE_NAME=$4
+
+CURRENT_USER=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+RDBMS_ACCESS_TOKEN=$(az account get-access-token --resource-type oss-rdbms --output tsv --query accessToken)
+
+sqlcmd -S ${DATABASE_FQDN} -d ${DATABASE_NAME} -U ${CURRENT_USER} -P "${RDBMS_ACCESS_TOKEN}" -G -l 30 <<EOF
+CREATE USER [${MANAGED_IDENTITY_NAME}] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [${MANAGED_IDENTITY_NAME}];
+ALTER ROLE db_datawriter ADD MEMBER [${MANAGED_IDENTITY_NAME}];
+ALTER ROLE db_ddladmin ADD MEMBER [${MANAGED_IDENTITY_NAME}];
+GO
+EOF

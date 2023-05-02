@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: petclinic-ingress
+  namespace: spring-petclinic
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /clinic(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: spring-petclinic-api-gateway
+            port:
+              number: 8080
+      - path: /dotnet(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-workload-identity
+            port:
+              number: 80
