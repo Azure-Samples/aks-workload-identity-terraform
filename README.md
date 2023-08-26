@@ -8,8 +8,8 @@ For this demo, it will be used the well-known Java example [Spring PetClinic](ht
 
 This sample has two parts:
 
-* Infrastructure deployment. There is a Terraform configuration to create an AKS cluster, a Container Registry and a MySQL Flexible server. It will do all configuration required to allow the cluster to use Workload Federated Identity.
-* Application deployment. There is another Terraform configuration that will create a Kubernetes Service for each microservice of the PetClinic application, will create an User-Assigned Managed Identity,will bind a service account to the identity and will configure the identity to access the MySQL server.
+* Infrastructure deployment. There is a Terraform configuration to create an AKS cluster, a Container Registry and a MySQL flexible Server. It will do all configuration required to allow the cluster to use Workload Federated Identity.
+* Application deployment. There is another Terraform configuration that will create a Kubernetes Service for each microservice of the PetClinic application, will create an User-Assigned Managed Identity,will bind a service account to the identity and will configure the identity to access the MySQL Server.
 
 ## Preparation
 
@@ -115,7 +115,7 @@ The infrastructure deployment consists of:
 * An AKS cluster with Workload Federated Identity enabled.
   * It is attached to the Container Registry.
   * The administrators group is configured as AKS AD Admins.
-* A MySQL Flexible server.
+* A MySQL flexible Server.
   * There is a managed identity associated to the server. This is necessary to allow AAD authentication.
   * A user is assigned as an AAD admin.
 
@@ -219,12 +219,12 @@ resource "azurerm_role_assignment" "acrpull_role" {
 }
 ```
 
-### MySQL Flexible server
+### MySQL flexible Server
 
 It is defined in [mysql](./terraform/infra/modules/mysql/) module. It creates:
 
-* A User-Assigned Managed Identity. This will be the identity associated to MySQL server. Among other features not related to this scenario, it is used to retrieve information from Azure AD about the users connecting to the server. If you plan to use RBAC features, such as granting permissions to groups, you will need to assign elevated permissions to this identity. See this [article](https://learn.microsoft.com/azure/mysql/flexible-server/concepts-azure-ad-authentication#permissions) for more details.
-* A MySQL Flexible server. It is configured to use Azure AD authentication. The identity created in the previous step is associated to the server.
+* A User-Assigned Managed Identity. This will be the identity associated to MySQL Server. Among other features not related to this scenario, it is used to retrieve information from Azure AD about the users connecting to the server. If you plan to use RBAC features, such as granting permissions to groups, you will need to assign elevated permissions to this identity. See this [article](https://learn.microsoft.com/azure/mysql/flexible-server/concepts-azure-ad-authentication#permissions) for more details.
+* A MySQL flexible Server. It is configured to use Azure AD authentication. The identity created in the previous step is associated to the server.
 * A MySQL AAD admin.
 * A firewall rule to allow current machine to connect to the server.
 * Create a database.
